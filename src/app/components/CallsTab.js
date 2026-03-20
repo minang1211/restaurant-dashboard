@@ -59,11 +59,11 @@ export default function CallsTab() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                     <MetricCard title="Calls Handled" value={total} />
+                    <MetricCard title="Answer Rate" value={total === 0 ? "—" : `${resolutionRate}%`} />
+                    <MetricCard title="Average Call Duration" value={total === 0 ? "—" : `${avgDuration}s`} />
                     <MetricCard title="Resolution Rate" value={total === 0 ? "—" : `${resolutionRate}%`} />
-                    <MetricCard title="Avg Duration" value={total === 0 ? "—" : `${avgDuration}s`} />
-                    <MetricCard title="AI Confidence" value={total === 0 ? "—" : `${avgConfidence}%`} />
-                    <MetricCard title="Unresolved" value={unresolved} />
-                    <MetricCard title="Follow-ups Needed" value={followups} />
+                    <MetricCard title="Escalation Rate" value={total === 0 ? "—" : `${Math.round((unresolved / total) * 100)}%`} />
+                    <MetricCard title="Abandoned Rate" value={total === 0 ? "—" : `${Math.round((followups / total) * 100)}%`} />
                 </div>
 
                 <div className="bg-[#1a2d4a]/50 rounded-3xl p-6 mb-12">

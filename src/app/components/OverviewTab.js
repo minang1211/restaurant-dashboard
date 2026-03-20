@@ -30,7 +30,7 @@ export default function OverviewTab() {
     const avgConfidence = Math.round(callLogs.reduce((sum, c) => sum + c.confidence, 0) / totalCalls * 100);
     const followups = callLogs.filter((c) => c.followupNeeded).length;
 
-    const staffMinutesSaved = Math.round(callLogs.reduce((sum, c) => sum + c.durationSec, 0) / 60);
+    const revenue = Math.round(callLogs.reduce((s, c) => s + c.durationSec, 0) * 3.5);
 
     const callsByDate = {};
     callLogs.forEach((c) => {
@@ -51,12 +51,12 @@ export default function OverviewTab() {
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                    <MetricCard title="Total Calls Handled" value={totalCalls} />
-                    <MetricCard title="Resolution Rate" value={`${answerRate}%`} />
+                    <MetricCard title="Calls Handled" value={totalCalls} />
+                    <MetricCard title="Call Duration" value={`${avgDuration} seconds`} />
                     <MetricCard title="Staff Minutes Saved" value={staffMinutesSaved} />
-                    <MetricCard title="Avg Call Duration" value={`${avgDuration}s`} />
+                    <MetricCard title="Resolution Rate" value={`${answerRate}%`} />
+                    <MetricCard title="Revenue" value={`$${revenue}`} />
                     <MetricCard title="AI Confidence" value={`${avgConfidence}%`} />
-                    <MetricCard title="Follow-ups Needed" value={followups} />
                 </div>
 
                 <div className="bg-[#1a2d4a]/50 rounded-3xl p-6 mb-12">
