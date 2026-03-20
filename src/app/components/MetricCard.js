@@ -6,7 +6,7 @@ export default function MetricCard({ title, value }) {
             <h3 className="text-[#f97316] font-bold text-lg mb-4 border-b border-[#1a2d4a] pb-2 w-full text-center">
                 {title}
             </h3>
-            <p className="text-5xl font-black text-white">{value}</p>
+            <p className="text-5xl font-black text-white text-center">{value}</p>
             <div className="absolute bottom-5 right-5 text-gray-500 hover:text-[#f97316] cursor-pointer">
                 <Info size={18} />
             </div>

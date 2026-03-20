@@ -33,7 +33,7 @@ export default function CallsTab() {
         const label = c.intent === "hours_location" ? "Hours / Location" : "Other";
         intentCounts[label] = (intentCounts[label] || 0) + 1;
     });
-    const pieColors = ["#f97316", "#1a2d4a", "#9ca3af", "#f59e0b", "#0f1d32"];
+    const pieColors = ["#f97316", "#38bdf8", "#4ade80", "#facc15", "#f87171", "#a78bfa", "#fb923c", "#e879f9"];
     const intentData = Object.entries(intentCounts).map(([name, value], i) => ({
         name,
         value,
