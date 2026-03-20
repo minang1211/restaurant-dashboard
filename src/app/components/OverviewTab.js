@@ -29,7 +29,7 @@ export default function OverviewTab() {
     const avgDuration = Math.round(callLogs.reduce((sum, c) => sum + c.durationSec, 0) / totalCalls);
     const avgConfidence = Math.round(callLogs.reduce((sum, c) => sum + c.confidence, 0) / totalCalls * 100);
     const followups = callLogs.filter((c) => c.followupNeeded).length;
-
+    const staffMinutesSaved = Math.round(callLogs.reduce((sum, c) => sum + c.durationSec, 0) / 60);
     const revenue = Math.round(callLogs.reduce((s, c) => s + c.durationSec, 0) * 3.5);
 
     const callsByDate = {};
