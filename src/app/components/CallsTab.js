@@ -30,7 +30,14 @@ export default function CallsTab() {
 
     const intentCounts = {};
     filtered.forEach((c) => {
-        const label = c.intent === "hours_location" ? "Hours / Location" : "Other";
+        const labels = {
+            takeout_order: "Takeout Order",
+            hours_location: "Hours / Location",
+            reservation: "Reservation",
+            catering_inquiry: "Catering Inquiry",
+            spam_call: "Spam Call",
+        };
+        const label = labels[c.intent] || "Other";
         intentCounts[label] = (intentCounts[label] || 0) + 1;
     });
     const pieColors = ["#f97316", "#38bdf8", "#4ade80", "#facc15", "#f87171", "#a78bfa", "#fb923c", "#e879f9"];
@@ -134,7 +141,7 @@ export default function CallsTab() {
                                         <td className="p-4 border-r border-[#1a2d4a] text-sm">{row.summary}</td>
                                         <td className="p-4 border-r border-[#1a2d4a] whitespace-nowrap">{Math.round(row.confidence * 100)}%</td>
                                         <td className="p-4">
-                                            <span className={`px-3 py-1 rounded-full text-sm font-bold ${row.outcome === "resolved"
+                                            <span className={`px-3 py-1 rounded-full text-sm font-bold ${row.outcome !== "resolved"
                                                     ? "bg-green-900/50 text-green-400"
                                                     : "bg-red-900/50 text-red-400"
                                                 }`}>

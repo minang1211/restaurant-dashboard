@@ -34,7 +34,14 @@ export default function ImpactTab() {
 
     const intentCounts = {};
     callLogs.forEach((c) => {
-        const label = c.intent === "hours_location" ? "Hours / Location" : "Other";
+        const labels = {
+            takeout_order: "Takeout Order",
+            hours_location: "Hours / Location",
+            reservation: "Reservation",
+            catering_inquiry: "Catering Inquiry",
+            spam_call: "Spam Call",
+        };
+        const label = labels[c.intent] || "Other";
         intentCounts[label] = (intentCounts[label] || 0) + 1;
     });
     const intentData = Object.entries(intentCounts).map(([name, value]) => ({

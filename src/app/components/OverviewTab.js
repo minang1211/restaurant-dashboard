@@ -103,7 +103,7 @@ export default function OverviewTab() {
                                     <td className="p-4 border-r border-[#1a2d4a] whitespace-nowrap">{row.intent.replace("_", " / ")}</td>
                                     <td className="p-4 border-r border-[#1a2d4a] text-sm">{row.summary}</td>
                                     <td className="p-4">
-                                        <span className={`px-3 py-1 rounded-full text-sm font-bold ${row.outcome === "resolved"
+                                        <span className={`px-3 py-1 rounded-full text-sm font-bold ${row.outcome !== "resolved"
                                                 ? "bg-green-900/50 text-green-400"
                                                 : "bg-red-900/50 text-red-400"
                                             }`}>
