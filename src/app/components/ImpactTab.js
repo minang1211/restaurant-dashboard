@@ -1,133 +1,199 @@
 "use client";
 
+import { useState } from "react";
 import {
-    BarChart,
-    Bar,
+    LineChart,
+    Line,
     XAxis,
     YAxis,
     Tooltip,
     ResponsiveContainer,
-    Cell,
+    CartesianGrid,
 } from "recharts";
 import MetricCard from "./MetricCard";
 import { callLogs } from "../data/callLogs";
 
+function toMMDDYYYY(dateStr) {
+    const [y, m, d] = dateStr.split("-");
+    return `${m}/${d}/${y}`;
+}
+
 export default function ImpactTab() {
-    const totalCalls = callLogs.length;
-    const resolved = callLogs.filter((c) => c.outcome === "resolved").length;
-    const totalSeconds = callLogs.reduce((s, c) => s + c.durationSec, 0);
-    const minutesSaved = Math.round(totalSeconds / 60);
-    const avgConfidence = Math.round(callLogs.reduce((s, c) => s + c.confidence, 0) / totalCalls * 100);
-    const followups = callLogs.filter((c) => c.followupNeeded).length;
+    const allDates = [...new Set(callLogs.map((c) => c.date))].sort();
+    const [startDate, setStartDate] = useState(allDates[0] || "");
+    const [endDate, setEndDate] = useState(allDates[allDates.length - 1] || "");
 
-    const costPerMinuteStaff = 0.5;
-    const estimatedSavings = (totalSeconds / 60 * costPerMinuteStaff).toFixed(2);
+    const filtered = callLogs.filter(
+        (c) => c.date >= startDate && c.date <= endDate
+    );
 
-    const callsByDate = {};
-    callLogs.forEach((c) => {
-        callsByDate[c.date] = (callsByDate[c.date] || 0) + 1;
+    const total = filtered.length;
+    const totalSeconds = filtered.reduce((s, c) => s + c.durationSec, 0);
+    const staffHoursSaved = Math.round(totalSeconds / 3600);
+    const revenue = Math.round(totalSeconds * 3.5);
+
+    const orderCalls = filtered.filter((c) => c.intent === "takeout_order").length;
+    const reservationCalls = filtered.filter((c) => c.intent === "reservation").length;
+    const uniqueCallers = new Set(filtered.map((c) => c.callerNumber).filter(Boolean)).size;
+
+    const revenueByDate = {};
+    filtered.forEach((c) => {
+        const d = c.date;
+        revenueByDate[d] = (revenueByDate[d] || 0) + Math.round(c.durationSec * 3.5);
     });
-    const dailyData = Object.entries(callsByDate).map(([date, count]) => ({
-        date: date.slice(5),
-        calls: count,
+    const dailyRevenue = Object.entries(revenueByDate).sort().map(([date, amount]) => ({
+        date: toMMDDYYYY(date),
+        revenue: amount,
     }));
 
-    const intentCounts = {};
-    callLogs.forEach((c) => {
-        const labels = {
-            takeout_order: "Takeout Order",
-            hours_location: "Hours / Location",
-            reservation: "Reservation",
-            catering_inquiry: "Catering Inquiry",
-            spam_call: "Spam Call",
-        };
-        const label = labels[c.intent] || "Other";
-        intentCounts[label] = (intentCounts[label] || 0) + 1;
+    const revenueByMonth = {};
+    filtered.forEach((c) => {
+        const month = c.date.slice(0, 7);
+        revenueByMonth[month] = (revenueByMonth[month] || 0) + Math.round(c.durationSec * 3.5);
     });
-    const intentData = Object.entries(intentCounts).map(([name, value]) => ({
-        name,
-        value,
+    const monthNames = {
+        "01": "January", "02": "February", "03": "March", "04": "April",
+        "05": "May", "06": "June", "07": "July", "08": "August",
+        "09": "September", "10": "October", "11": "November", "12": "December",
+    };
+    const monthlyRevenue = Object.entries(revenueByMonth).sort().map(([ym, amount]) => ({
+        month: monthNames[ym.slice(5)] || ym,
+        revenue: amount,
     }));
+
+    const today = new Date();
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const dayNum = today.getDate();
+    const suffix =
+        dayNum % 10 === 1 && dayNum !== 11 ? "st" :
+            dayNum % 10 === 2 && dayNum !== 12 ? "nd" :
+                dayNum % 10 === 3 && dayNum !== 13 ? "rd" : "th";
+    const dateString = `${days[today.getDay()]}, ${months[today.getMonth()]} ${dayNum}${suffix}, ${today.getFullYear()}`;
+
+    function CustomTooltip({ active, payload, label }) {
+        if (active && payload && payload.length) {
+            return (
+                <div className="bg-[#0f1d32] border border-[#f97316] rounded-lg px-4 py-2 shadow-lg">
+                    <p className="text-gray-400 text-xs">{label}</p>
+                    <p className="text-[#f97316] font-bold text-lg">${payload[0].value.toLocaleString()}</p>
+                </div>
+            );
+        }
+        return null;
+    }
 
     return (
         <>
-            <h1 className="text-3xl font-bold mb-6 text-white">Business Impact</h1>
+            <div className="bg-[#0f1d32] rounded-2xl p-4 mb-6 text-center border border-[#1a2d4a]">
+                <h1 className="text-2xl font-bold text-white">Business Impact</h1>
+                <p className="text-gray-400 text-sm">{dateString}</p>
+            </div>
 
             <div className="bg-[#0f1d32] rounded-[2rem] p-8 shadow-inner border border-[#1a2d4a]">
 
-                <p className="text-center text-gray-400 mb-8 text-sm">
-                    Data from {callLogs[0].date} to {callLogs[callLogs.length - 1].date}
-                </p>
+                <div className="flex items-center justify-center gap-4 mb-8 flex-wrap">
+                    <div className="flex items-center gap-2 bg-[#1a2d4a] rounded-xl px-4 py-2">
+                        <span className="font-bold text-sm text-[#f97316]">Filter From:</span>
+                        <input
+                            type="date"
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            className="bg-[#0f1d32] border border-[#1a2d4a] rounded-lg px-3 py-1 text-sm font-bold text-white"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2 bg-[#1a2d4a] rounded-xl px-4 py-2">
+                        <span className="font-bold text-sm text-[#f97316]">To:</span>
+                        <input
+                            type="date"
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            className="bg-[#0f1d32] border border-[#1a2d4a] rounded-lg px-3 py-1 text-sm font-bold text-white"
+                        />
+                    </div>
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                    <MetricCard title="Calls AI Handled" value={totalCalls} />
-                    <MetricCard title="Successfully Resolved" value={resolved} />
-                    <MetricCard title="Resolution Rate" value={`${Math.round((resolved / totalCalls) * 100)}%`} />
-                    <MetricCard title="Staff Minutes Saved" value={minutesSaved} />
-                    <MetricCard title="Estimated Savings" value={`$${estimatedSavings}`} />
-                    <MetricCard title="Avg AI Confidence" value={`${avgConfidence}%`} />
+                    <MetricCard title="Influenced Revenue" value={`$${revenue.toLocaleString()}`} />
+                    <MetricCard title="Orders Placed" value={orderCalls} />
+                    <MetricCard title="Reservations Booked" value={reservationCalls} />
+                    <MetricCard title="Staff Hours Saved" value={staffHoursSaved} />
+                    <MetricCard title="New Customers" value={uniqueCallers} />
+                    <MetricCard title="Total Calls Handled" value={total} />
                 </div>
 
                 <div className="bg-[#1a2d4a]/50 rounded-3xl p-6 mb-8">
-                    <h3 className="text-xl font-bold text-center underline decoration-[#f97316] decoration-2 underline-offset-4 mb-6 text-white">
-                        Calls Handled by AI Per Day
+                    <h3 className="text-lg font-bold text-gray-300 mb-6">
+                        Influenced Revenue (Last 30 Days)
                     </h3>
-                    <div className="h-64 w-full">
+                    <div className="h-80 w-full">
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={dailyData}>
-                                <XAxis dataKey="date" tick={{ fill: "#9ca3af" }} />
-                                <YAxis allowDecimals={false} tick={{ fill: "#9ca3af" }} />
-                                <Tooltip contentStyle={{ backgroundColor: "#0f1d32", border: "1px solid #1a2d4a", color: "#fff" }} />
-                                <Bar dataKey="calls" radius={[4, 4, 0, 0]}>
-                                    {dailyData.map((_, index) => (
-                                        <Cell key={`cell-${index}`} fill="#f97316" />
-                                    ))}
-                                </Bar>
-                            </BarChart>
+                            <LineChart data={dailyRevenue}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#1a2d4a" />
+                                <XAxis
+                                    dataKey="date"
+                                    angle={-45}
+                                    textAnchor="end"
+                                    height={60}
+                                    tick={{ fontSize: 10, fill: "#9ca3af" }}
+                                    axisLine={{ stroke: "#1a2d4a" }}
+                                />
+                                <YAxis
+                                    tickFormatter={(v) => `$${v}`}
+                                    tick={{ fill: "#9ca3af" }}
+                                    axisLine={{ stroke: "#1a2d4a" }}
+                                    label={{ value: "Revenue", angle: -90, position: "insideLeft", fill: "#9ca3af", style: { fontSize: 12 } }}
+                                />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Line
+                                    type="monotone"
+                                    dataKey="revenue"
+                                    stroke="#f97316"
+                                    strokeWidth={2}
+                                    dot={{ r: 5, fill: "#f97316", stroke: "#f97316" }}
+                                    activeDot={{ r: 8, fill: "#f97316", stroke: "#fff", strokeWidth: 2 }}
+                                />
+                            </LineChart>
                         </ResponsiveContainer>
                     </div>
+                    <p className="text-center text-gray-500 text-xs mt-2">Date</p>
                 </div>
 
-                <div className="bg-[#1a2d4a]/50 rounded-3xl p-6 mb-8">
-                    <h3 className="text-xl font-bold text-center underline decoration-[#f97316] decoration-2 underline-offset-4 mb-6 text-white">
-                        What Callers Asked About
+                <div className="bg-[#1a2d4a]/50 rounded-3xl p-6">
+                    <h3 className="text-lg font-bold text-gray-300 mb-6">
+                        Influenced Revenue (Last 6 Months)
                     </h3>
-                    <div className="h-48 w-full">
+                    <div className="h-80 w-full">
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={intentData} layout="vertical">
-                                <XAxis type="number" allowDecimals={false} tick={{ fill: "#9ca3af" }} />
-                                <YAxis dataKey="name" type="category" tick={{ fill: "#9ca3af" }} width={120} />
-                                <Tooltip contentStyle={{ backgroundColor: "#0f1d32", border: "1px solid #1a2d4a", color: "#fff" }} />
-                                <Bar dataKey="value" radius={[0, 4, 4, 0]} fill="#f97316" />
-                            </BarChart>
+                            <LineChart data={monthlyRevenue}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#1a2d4a" />
+                                <XAxis
+                                    dataKey="month"
+                                    angle={-45}
+                                    textAnchor="end"
+                                    height={80}
+                                    tick={{ fontSize: 11, fill: "#9ca3af" }}
+                                    axisLine={{ stroke: "#1a2d4a" }}
+                                />
+                                <YAxis
+                                    tickFormatter={(v) => `$${v.toLocaleString()}`}
+                                    tick={{ fill: "#9ca3af" }}
+                                    axisLine={{ stroke: "#1a2d4a" }}
+                                    label={{ value: "Revenue", angle: -90, position: "insideLeft", fill: "#9ca3af", style: { fontSize: 12 } }}
+                                />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Line
+                                    type="monotone"
+                                    dataKey="revenue"
+                                    stroke="#f97316"
+                                    strokeWidth={2}
+                                    dot={{ r: 6, fill: "#f97316", stroke: "#f97316" }}
+                                    activeDot={{ r: 10, fill: "#f97316", stroke: "#fff", strokeWidth: 2 }}
+                                />
+                            </LineChart>
                         </ResponsiveContainer>
                     </div>
-                </div>
-
-                <div className="bg-[#1a2d4a]/50 rounded-3xl p-8">
-                    <h3 className="text-xl font-bold text-center underline decoration-[#f97316] decoration-2 underline-offset-4 mb-6 text-white">
-                        Key Takeaways
-                    </h3>
-                    <div className="space-y-4 max-w-2xl mx-auto">
-                        <div className="flex items-start gap-3">
-                            <span className="text-[#f97316] font-bold text-lg">✓</span>
-                            <p className="text-gray-300">AI resolved <span className="text-white font-bold">{resolved} out of {totalCalls}</span> calls without staff involvement</p>
-                        </div>
-                        <div className="flex items-start gap-3">
-                            <span className="text-[#f97316] font-bold text-lg">✓</span>
-                            <p className="text-gray-300">Saved approximately <span className="text-white font-bold">{minutesSaved} minutes</span> of staff phone time</p>
-                        </div>
-                        <div className="flex items-start gap-3">
-                            <span className="text-[#f97316] font-bold text-lg">✓</span>
-                            <p className="text-gray-300">Most callers asked about <span className="text-white font-bold">hours and location</span> — the AI handles this perfectly</p>
-                        </div>
-                        {followups > 0 && (
-                            <div className="flex items-start gap-3">
-                                <span className="text-yellow-500 font-bold text-lg">!</span>
-                                <p className="text-gray-300"><span className="text-white font-bold">{followups} call(s)</span> needed follow-up — consider reviewing those</p>
-                            </div>
-                        )}
-                    </div>
+                    <p className="text-center text-gray-500 text-xs mt-2">Month</p>
                 </div>
             </div>
         </>
