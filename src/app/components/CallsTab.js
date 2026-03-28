@@ -6,9 +6,9 @@ import MetricCard from "./MetricCard";
 import { callLogs } from "../data/callLogs";
 
 const intentLabels = {
-    takeout_order: "Phone Order",
+    takeout_order: "Phone Orders",
     hours_location: "Other",
-    reservation: "Reservation",
+    reservation: "Reservations",
     catering_inquiry: "Catering",
     spam_call: "Spam",
 };
@@ -26,6 +26,11 @@ const timeOfDay = [
     { label: "Afternoon", min: 12, max: 17 },
     { label: "Evening", min: 17, max: 24 },
 ];
+
+function toMMDDYYYY(dateStr) {
+    const [y, m, d] = dateStr.split("-");
+    return `${m}/${d}/${y}`;
+}
 
 function formatDuration(sec) {
     const m = Math.floor(sec / 60);
@@ -59,7 +64,7 @@ function ColumnFilter({ label, options, selected, onToggle, onToggleAll }) {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const allSelected = options.every((o) => selected.includes(o.value));
+    const allSelected = options.length > 0 && options.every((o) => selected.includes(o.value));
 
     return (
         <th className="p-4 font-bold border-r border-[#1a2d4a] relative" ref={ref}>
@@ -72,7 +77,7 @@ function ColumnFilter({ label, options, selected, onToggle, onToggleAll }) {
             </button>
 
             {open && (
-                <div className="absolute left-0 top-full mt-1 w-48 bg-[#0f1d32] border border-[#1a2d4a] rounded-lg shadow-lg z-50 overflow-hidden max-h-64 overflow-y-auto">
+                <div className="absolute left-0 top-full mt-1 w-48 bg-[#0f1d32] border border-[#1a2d4a] rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
                     <button
                         onClick={onToggleAll}
                         className="w-full text-left px-3 py-2 text-xs font-bold text-gray-300 hover:bg-[#1a2d4a] border-b border-[#1a2d4a] flex items-center gap-2"
@@ -121,7 +126,7 @@ export default function CallsTab() {
     const [selectedInquiries, setSelectedInquiries] = useState(allIntentValues);
     const [selectedStatuses, setSelectedStatuses] = useState(allOutcomeValues);
 
-    function toggleItem(list, setList, allItems, value) {
+    function toggleItem(list, setList, value) {
         if (list.includes(value)) {
             setList(list.filter((v) => v !== value));
         } else {
@@ -182,14 +187,11 @@ export default function CallsTab() {
                 dayNum % 10 === 3 && dayNum !== 13 ? "rd" : "th";
     const dateString = `${days[today.getDay()]}, ${months[today.getMonth()]} ${dayNum}${suffix}, ${today.getFullYear()}`;
 
-    const dateOptions = allDates.map((d) => ({ value: d, label: d }));
+    const dateOptions = allDates.map((d) => ({ value: d, label: toMMDDYYYY(d) }));
     const timeOptions = timeOfDay.map((t) => ({ value: t.label, label: t.label }));
     const durationOptions = durationRanges.map((r) => ({ value: r.label, label: r.label }));
     const inquiryOptions = allIntentValues.map((i) => ({ value: i, label: intentLabels[i] || i }));
-    const statusOptions = allOutcomeValues.map((o) => ({
-        value: o,
-        label: getStatusLabel(o),
-    }));
+    const statusOptions = allOutcomeValues.map((o) => ({ value: o, label: getStatusLabel(o) }));
 
     const displayData = [...filtered].reverse().slice(0, showCount);
 
@@ -240,33 +242,30 @@ export default function CallsTab() {
                                 <tr className="border-b-2 border-[#f97316]">
                                     <ColumnFilter
                                         label="DATE"
-                                        options={[...dateOptions, ...timeOptions]}
-                                        selected={[...selectedDates, ...selectedTimes]}
-                                        onToggle={(val) => {
-                                            if (allDates.includes(val)) {
-                                                toggleItem(selectedDates, setSelectedDates, allDates, val);
-                                            } else {
-                                                toggleItem(selectedTimes, setSelectedTimes, allTimeValues, val);
-                                            }
-                                        }}
-                                        onToggleAll={() => {
-                                            toggleAll(selectedDates, setSelectedDates, allDates);
-                                            toggleAll(selectedTimes, setSelectedTimes, allTimeValues);
-                                        }}
+                                        options={dateOptions}
+                                        selected={selectedDates}
+                                        onToggle={(val) => toggleItem(selectedDates, setSelectedDates, val)}
+                                        onToggleAll={() => toggleAll(selectedDates, setSelectedDates, allDates)}
                                     />
-                                    <th className="p-4 font-bold border-r border-[#1a2d4a] text-[#f97316]">TIME</th>
+                                    <ColumnFilter
+                                        label="TIME"
+                                        options={timeOptions}
+                                        selected={selectedTimes}
+                                        onToggle={(val) => toggleItem(selectedTimes, setSelectedTimes, val)}
+                                        onToggleAll={() => toggleAll(selectedTimes, setSelectedTimes, allTimeValues)}
+                                    />
                                     <ColumnFilter
                                         label="DURATION"
                                         options={durationOptions}
                                         selected={selectedDurations}
-                                        onToggle={(val) => toggleItem(selectedDurations, setSelectedDurations, allDurationValues, val)}
+                                        onToggle={(val) => toggleItem(selectedDurations, setSelectedDurations, val)}
                                         onToggleAll={() => toggleAll(selectedDurations, setSelectedDurations, allDurationValues)}
                                     />
                                     <ColumnFilter
                                         label="INQUIRY"
                                         options={inquiryOptions}
                                         selected={selectedInquiries}
-                                        onToggle={(val) => toggleItem(selectedInquiries, setSelectedInquiries, allIntentValues, val)}
+                                        onToggle={(val) => toggleItem(selectedInquiries, setSelectedInquiries, val)}
                                         onToggleAll={() => toggleAll(selectedInquiries, setSelectedInquiries, allIntentValues)}
                                     />
                                     <th className="p-4 font-bold border-r border-[#1a2d4a] text-[#f97316]">SUMMARY</th>
@@ -274,7 +273,7 @@ export default function CallsTab() {
                                         label="STATUS"
                                         options={statusOptions}
                                         selected={selectedStatuses}
-                                        onToggle={(val) => toggleItem(selectedStatuses, setSelectedStatuses, allOutcomeValues, val)}
+                                        onToggle={(val) => toggleItem(selectedStatuses, setSelectedStatuses, val)}
                                         onToggleAll={() => toggleAll(selectedStatuses, setSelectedStatuses, allOutcomeValues)}
                                     />
                                 </tr>
@@ -289,7 +288,7 @@ export default function CallsTab() {
                                 ) : (
                                     displayData.map((row) => (
                                         <tr key={row.id} className="hover:bg-[#1a2d4a] text-gray-300">
-                                            <td className="p-4 border-r border-[#1a2d4a] whitespace-nowrap">{row.date}</td>
+                                            <td className="p-4 border-r border-[#1a2d4a] whitespace-nowrap">{toMMDDYYYY(row.date)}</td>
                                             <td className="p-4 border-r border-[#1a2d4a] whitespace-nowrap">{row.time}</td>
                                             <td className="p-4 border-r border-[#1a2d4a] whitespace-nowrap">{formatDuration(row.durationSec)}</td>
                                             <td className="p-4 border-r border-[#1a2d4a] whitespace-nowrap">{intentLabels[row.intent] || row.intent}</td>
