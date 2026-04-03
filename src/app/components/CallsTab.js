@@ -70,19 +70,19 @@ function ColumnFilter({ label, options, selected, onToggle, onToggleAll }) {
         <th className="p-4 font-bold border-r border-[#1a2d4a] relative" ref={ref}>
             <button
                 onClick={() => setOpen(!open)}
-                className="flex items-center gap-1 text-[#f97316] hover:text-white transition-colors"
+                className="flex items-center gap-1 text-[#FF5900] hover:text-white transition-colors"
             >
                 {label}
                 <ChevronDown size={12} className={`transition-transform ${open ? "rotate-180" : ""}`} />
             </button>
 
             {open && (
-                <div className="absolute left-0 top-full mt-1 w-48 bg-[#0f1d32] border border-[#1a2d4a] rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                <div className="absolute left-0 top-full mt-1 w-48 bg-[#0A2342] border border-[#1a2d4a] rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
                     <button
                         onClick={onToggleAll}
                         className="w-full text-left px-3 py-2 text-xs font-bold text-gray-300 hover:bg-[#1a2d4a] border-b border-[#1a2d4a] flex items-center gap-2"
                     >
-                        <span className={`w-3.5 h-3.5 rounded border flex items-center justify-center text-[10px] ${allSelected ? "bg-[#f97316] border-[#f97316] text-white" : "border-gray-500"
+                        <span className={`w-3.5 h-3.5 rounded border flex items-center justify-center text-[10px] ${allSelected ? "bg-[#FF5900] border-[#FF5900] text-white" : "border-gray-500"
                             }`}>
                             {allSelected ? "✓" : ""}
                         </span>
@@ -95,7 +95,7 @@ function ColumnFilter({ label, options, selected, onToggle, onToggleAll }) {
                             className="w-full text-left px-3 py-2 text-xs font-bold text-gray-300 hover:bg-[#1a2d4a] flex items-center gap-2"
                         >
                             <span className={`w-3.5 h-3.5 rounded border flex items-center justify-center text-[10px] ${selected.includes(opt.value)
-                                    ? "bg-[#f97316] border-[#f97316] text-white"
+                                    ? "bg-[#FF5900] border-[#FF5900] text-white"
                                     : "border-gray-500"
                                 }`}>
                                 {selected.includes(opt.value) ? "✓" : ""}
@@ -197,30 +197,30 @@ export default function CallsTab() {
 
     return (
         <>
-            <div className="bg-[#0f1d32] rounded-2xl p-4 mb-6 text-center border border-[#1a2d4a]">
+            <div className="bg-[#0A2342] rounded-2xl p-4 mb-6 text-center border border-[#1a2d4a]">
                 <h1 className="text-2xl font-bold text-white">Calls & Customers</h1>
                 <p className="text-gray-400 text-sm">{dateString}</p>
             </div>
 
-            <div className="bg-[#0f1d32] rounded-[2rem] p-8 shadow-inner border border-[#1a2d4a]">
+            <div className="bg-[#0A2342] rounded-[2rem] p-8 shadow-inner border border-[#1a2d4a]">
 
                 <div className="flex items-center justify-center gap-4 mb-8 flex-wrap">
                     <div className="flex items-center gap-2 bg-[#1a2d4a] rounded-xl px-4 py-2">
-                        <span className="font-bold text-sm text-[#f97316]">Filter From:</span>
+                        <span className="font-bold text-sm text-[#FF5900]">Filter From:</span>
                         <input
                             type="date"
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
-                            className="bg-[#0f1d32] border border-[#1a2d4a] rounded-lg px-3 py-1 text-sm font-bold text-white"
+                            className="bg-[#0A2342] border border-[#1a2d4a] rounded-lg px-3 py-1 text-sm font-bold text-white"
                         />
                     </div>
                     <div className="flex items-center gap-2 bg-[#1a2d4a] rounded-xl px-4 py-2">
-                        <span className="font-bold text-sm text-[#f97316]">To:</span>
+                        <span className="font-bold text-sm text-[#FF5900]">To:</span>
                         <input
                             type="date"
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
-                            className="bg-[#0f1d32] border border-[#1a2d4a] rounded-lg px-3 py-1 text-sm font-bold text-white"
+                            className="bg-[#0A2342] border border-[#1a2d4a] rounded-lg px-3 py-1 text-sm font-bold text-white"
                         />
                     </div>
                 </div>
@@ -239,7 +239,7 @@ export default function CallsTab() {
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b-2 border-[#f97316]">
+                                <tr className="border-b-2 border-[#FF5900]">
                                     <ColumnFilter
                                         label="DATE"
                                         options={dateOptions}
@@ -268,7 +268,7 @@ export default function CallsTab() {
                                         onToggle={(val) => toggleItem(selectedInquiries, setSelectedInquiries, val)}
                                         onToggleAll={() => toggleAll(selectedInquiries, setSelectedInquiries, allIntentValues)}
                                     />
-                                    <th className="p-4 font-bold border-r border-[#1a2d4a] text-[#f97316]">SUMMARY</th>
+                                    <th className="p-4 font-bold border-r border-[#1a2d4a] text-[#FF5900]">SUMMARY</th>
                                     <ColumnFilter
                                         label="STATUS"
                                         options={statusOptions}
@@ -309,7 +309,7 @@ export default function CallsTab() {
                         <div className="p-4 text-center border-t border-[#1a2d4a]">
                             <button
                                 onClick={() => setShowCount(showCount + 10)}
-                                className="bg-[#1a2d4a] hover:bg-[#f97316] text-white font-bold py-2 px-6 rounded-full transition-colors text-sm"
+                                className="bg-[#1a2d4a] hover:bg-[#FF5900] text-white font-bold py-2 px-6 rounded-full transition-colors text-sm"
                             >
                                 View More
                             </button>

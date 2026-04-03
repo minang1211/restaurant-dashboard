@@ -74,9 +74,9 @@ export default function ImpactTab() {
     function CustomTooltip({ active, payload, label }) {
         if (active && payload && payload.length) {
             return (
-                <div className="bg-[#0f1d32] border border-[#f97316] rounded-lg px-4 py-2 shadow-lg">
+                <div className="bg-[#0A2342] border border-[#FF5900] rounded-lg px-4 py-2 shadow-lg">
                     <p className="text-gray-400 text-xs">{label}</p>
-                    <p className="text-[#f97316] font-bold text-lg">${payload[0].value.toLocaleString()}</p>
+                    <p className="text-[#FF5900] font-bold text-lg">${payload[0].value.toLocaleString()}</p>
                 </div>
             );
         }
@@ -85,30 +85,30 @@ export default function ImpactTab() {
 
     return (
         <>
-            <div className="bg-[#0f1d32] rounded-2xl p-4 mb-6 text-center border border-[#1a2d4a]">
+            <div className="bg-[#0A2342] rounded-2xl p-4 mb-6 text-center border border-[#1a2d4a]">
                 <h1 className="text-2xl font-bold text-white">Business Impact</h1>
                 <p className="text-gray-400 text-sm">{dateString}</p>
             </div>
 
-            <div className="bg-[#0f1d32] rounded-[2rem] p-8 shadow-inner border border-[#1a2d4a]">
+            <div className="bg-[#0A2342] rounded-[2rem] p-8 shadow-inner border border-[#1a2d4a]">
 
                 <div className="flex items-center justify-center gap-4 mb-8 flex-wrap">
                     <div className="flex items-center gap-2 bg-[#1a2d4a] rounded-xl px-4 py-2">
-                        <span className="font-bold text-sm text-[#f97316]">Filter From:</span>
+                        <span className="font-bold text-sm text-[#FF5900]">Filter From:</span>
                         <input
                             type="date"
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
-                            className="bg-[#0f1d32] border border-[#1a2d4a] rounded-lg px-3 py-1 text-sm font-bold text-white"
+                            className="bg-[#0A2342] border border-[#1a2d4a] rounded-lg px-3 py-1 text-sm font-bold text-white"
                         />
                     </div>
                     <div className="flex items-center gap-2 bg-[#1a2d4a] rounded-xl px-4 py-2">
-                        <span className="font-bold text-sm text-[#f97316]">To:</span>
+                        <span className="font-bold text-sm text-[#FF5900]">To:</span>
                         <input
                             type="date"
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
-                            className="bg-[#0f1d32] border border-[#1a2d4a] rounded-lg px-3 py-1 text-sm font-bold text-white"
+                            className="bg-[#0A2342] border border-[#1a2d4a] rounded-lg px-3 py-1 text-sm font-bold text-white"
                         />
                     </div>
                 </div>
@@ -148,10 +148,10 @@ export default function ImpactTab() {
                                 <Line
                                     type="monotone"
                                     dataKey="revenue"
-                                    stroke="#f97316"
+                                    stroke="#FF5900"
                                     strokeWidth={2}
-                                    dot={{ r: 5, fill: "#f97316", stroke: "#f97316" }}
-                                    activeDot={{ r: 8, fill: "#f97316", stroke: "#fff", strokeWidth: 2 }}
+                                    dot={{ r: 5, fill: "#FF5900", stroke: "#FF5900" }}
+                                    activeDot={{ r: 8, fill: "#FF5900", stroke: "#fff", strokeWidth: 2 }}
                                 />
                             </LineChart>
                         </ResponsiveContainer>
@@ -185,10 +185,10 @@ export default function ImpactTab() {
                                 <Line
                                     type="monotone"
                                     dataKey="revenue"
-                                    stroke="#f97316"
+                                    stroke="#FF5900"
                                     strokeWidth={2}
-                                    dot={{ r: 6, fill: "#f97316", stroke: "#f97316" }}
-                                    activeDot={{ r: 10, fill: "#f97316", stroke: "#fff", strokeWidth: 2 }}
+                                    dot={{ r: 6, fill: "#FF5900", stroke: "#FF5900" }}
+                                    activeDot={{ r: 10, fill: "#FF5900", stroke: "#fff", strokeWidth: 2 }}
                                 />
                             </LineChart>
                         </ResponsiveContainer>
