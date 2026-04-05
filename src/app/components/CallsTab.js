@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 import MetricCard from "./MetricCard";
-import { callLogs } from "../data/callLogs";
+import useCallLogs from "./useCallLogs";
 
 const intentLabels = {
     takeout_order: "Phone Orders",
@@ -110,6 +110,7 @@ function ColumnFilter({ label, options, selected, onToggle, onToggleAll }) {
 }
 
 export default function CallsTab() {
+    const { callLogs, loading } = useCallLogs();
     const allDates = [...new Set(callLogs.map((c) => c.date))].sort().reverse();
     const [startDate, setStartDate] = useState(allDates[allDates.length - 1] || "");
     const [endDate, setEndDate] = useState(allDates[0] || "");
@@ -194,7 +195,7 @@ export default function CallsTab() {
     const statusOptions = allOutcomeValues.map((o) => ({ value: o, label: getStatusLabel(o) }));
 
     const displayData = [...filtered].reverse().slice(0, showCount);
-
+    if (loading) return <p className="text-gray-400 text-center p-12">Loading call data...</p>;
     return (
         <>
             <div className="bg-[#0A2342] rounded-2xl p-4 mb-6 text-center border border-[#1a2d4a]">

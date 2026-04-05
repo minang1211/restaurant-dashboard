@@ -11,7 +11,7 @@ import {
     CartesianGrid,
 } from "recharts";
 import MetricCard from "./MetricCard";
-import { callLogs } from "../data/callLogs";
+import useCallLogs from "./useCallLogs";
 
 function toMMDDYYYY(dateStr) {
     const [y, m, d] = dateStr.split("-");
@@ -19,6 +19,7 @@ function toMMDDYYYY(dateStr) {
 }
 
 export default function ImpactTab() {
+    const { callLogs, loading } = useCallLogs();
     const allDates = [...new Set(callLogs.map((c) => c.date))].sort();
     const [startDate, setStartDate] = useState(allDates[0] || "");
     const [endDate, setEndDate] = useState(allDates[allDates.length - 1] || "");
@@ -82,7 +83,7 @@ export default function ImpactTab() {
         }
         return null;
     }
-
+        if (loading) return <p className="text-gray-400 text-center p-12">Loading call data...</p>;
     return (
         <>
             <div className="bg-[#0A2342] rounded-2xl p-4 mb-6 text-center border border-[#1a2d4a]">
